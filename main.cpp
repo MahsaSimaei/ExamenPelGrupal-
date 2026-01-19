@@ -139,6 +139,41 @@ public:
 // y te ayudo a completarlas.
 
 int main() {
+    int opcion = -1;
+
+    while (opcion != 0) {
+        // Encabezado estilizado según la imagen
+        cout << "====================================================" << endl;
+        cout << "||                                                ||" << endl;
+        cout << "||      BIENVENIDO AL SISTEMA DE BATALLA GISBERIA ||" << endl;
+        cout << "||                                                ||" << endl;
+        cout << "====================================================" << endl << endl;
+
+        cout << "=== PARTIDAS GUARDADAS ===" << endl << endl;
+
+        cout << "[1] Geo_partida.json" << endl;
+        cout << "[2] Crear nueva partida" << endl;
+        cout << "[0] Salir" << endl << endl;
+
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        switch (opcion) {
+            case 1:
+                cout << "\nCargando partida...\n" << endl;
+                // Aquí iría la lógica para cargar el objeto Jugador y su Ejercito
+                break;
+            case 2:
+                cout << "\nIniciando configuracion de nueva partida...\n" << endl;
+                // Aquí llamarías a la creación de Jugador y selección de Tropas
+                break;
+            case 0:
+                cout << "Saliendo del sistema..." << endl;
+                break;
+            default:
+                cout << "Opcion no valida. Intente de nuevo." << endl;
+        }
+    }
     // Ejemplo de uso rápido
     Soldado s1("Legionario", true, 1, 15);
     Item pocion("Poción de Fuerza", TipoItem::BOOST_PODER, 8);
