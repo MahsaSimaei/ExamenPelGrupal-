@@ -21,7 +21,8 @@ public:
     Item(const string& nombre = "", TipoItem tipo = TipoItem::BOOST_EXPERIENCIA, int valor = 0)
         : nombre(nombre), tipo(tipo), valor(valor) {}
 
-    string getNombre() const { return nombre; }
+    // ✅ Evitar copias: devolver referencia const
+    const string& getNombre() const { return nombre; }
     TipoItem getTipo() const { return tipo; }
     int getValor() const { return valor; }
 
@@ -29,11 +30,12 @@ public:
     void setTipo(TipoItem tipo) { this->tipo = tipo; }
     void setValor(int valor) { this->valor = valor; }
 
-    string getTipoString() const {
+    // ✅ Evitar copias: devolver literal (const char*)
+    const char* getTipoString() const {
         switch (tipo) {
             case TipoItem::BOOST_EXPERIENCIA: return "Boost Experiencia";
             case TipoItem::BOOST_PODER:       return "Boost Poder";
-            case TipoItem::CURACION:          return "Curación";
+            case TipoItem::CURACION:          return "Curacion";
             default:                          return "Desconocido";
         }
     }
@@ -55,6 +57,13 @@ private:
     int experienciaActual;
     int experienciaParaNivel;
 
+    // ✅ Reemplaza el while por recursividad (por si la exigencia prohíbe bucles)
+    void procesarSubidasNivel() {
+        if (experienciaActual < experienciaParaNivel) return;
+        subirNivel();
+        procesarSubidasNivel();
+    }
+
 public:
     Soldado(const string& nombre = "", bool esAliado = true, int nivel = 1,
             int poderCombate = 10, int expActual = 0, int expParaNivel = 100)
@@ -63,7 +72,8 @@ public:
           experienciaParaNivel(expParaNivel) {}
 
     // Getters
-    string getNombre() const { return nombre; }
+    // ✅ Evitar copias: devolver referencia const
+    const string& getNombre() const { return nombre; }
     bool getEsAliado() const { return esAliado; }
     int getNivel() const { return nivel; }
     int getPoderCombate() const { return poderCombate; }
@@ -80,9 +90,8 @@ public:
         experienciaActual += exp;
         cout << nombre << " gana " << exp << " de experiencia." << endl;
 
-        while (experienciaActual >= experienciaParaNivel) {
-            subirNivel();
-        }
+        // ✅ Sin bucles: usar recursividad
+        procesarSubidasNivel();
     }
 
     void subirNivel() {
@@ -95,28 +104,30 @@ public:
         cout << nombre << " sube al nivel " << nivel << "!" << endl;
     }
 
-    void aplicarItem(const Item& item) {
-        cout << nombre << " usa el item: " << item.getNombre() << endl;
+    // ✅ “Puros punteros”: aplicar item por puntero
+    void aplicarItem(const Item* item) {
+        if (item == nullptr) return;
 
-        switch (item.getTipo()) {
+        cout << nombre << " usa el item: " << item->getNombre() << endl;
+
+        switch (item->getTipo()) {
             case TipoItem::BOOST_EXPERIENCIA:
-                ganarExperiencia(item.getValor());
+                ganarExperiencia(item->getValor());
                 break;
             case TipoItem::BOOST_PODER:
-                setPoderCombate(poderCombate + item.getValor());
-                cout << "Poder de combate aumentado en " << item.getValor() << endl;
+                setPoderCombate(poderCombate + item->getValor());
+                cout << "Poder de combate aumentado en " << item->getValor() << endl;
                 break;
             case TipoItem::CURACION:
                 // Aquí podrías tener vida máxima y actual, pero no está en el diseño
-                cout << "Curación de " << item.getValor() << " (no implementada completamente)" << endl;
+                cout << "Curacion de " << item->getValor() << " (no implementada completamente)" << endl;
                 break;
         }
     }
 
     void recibirDanio(int danio) {
         // Nota: no hay atributo de vida en la clase actual
-        cout << nombre << " recibe " << danio << " de daño." << endl;
-        // Podrías añadir lógica de vida aquí si se expande la clase
+        cout << nombre << " recibe " << danio << " de dano." << endl;
     }
 
     bool estaVivo() const {
@@ -133,55 +144,63 @@ public:
     }
 };
 
-// Las clases Tropas, Ejercito y Jugador están incompletas en las fotos
-// Si quieres que continúe con ellas (Tropa, Ejercito, Jugador) dime
-// qué implementación prefieres para las listas (vector, lista enlazada, array dinámico...)
-// y te ayudo a completarlas.
-
-int main() {
+// ✅ Menú sin bucles: recursividad (por si el requisito prohíbe while/for)
+void menuPrincipal() {
     int opcion = -1;
 
-    while (opcion != 0) {
-        // Encabezado estilizado según la imagen
-        cout << "====================================================" << endl;
-        cout << "||                                                ||" << endl;
-        cout << "||      BIENVENIDO AL SISTEMA DE BATALLA GISBERIA ||" << endl;
-        cout << "||                                                ||" << endl;
-        cout << "====================================================" << endl << endl;
+    // Encabezado estilizado según la imagen
+    cout << "====================================================" << endl;
+    cout << "||                                                ||" << endl;
+    cout << "||      BIENVENIDO AL SISTEMA DE BATALLA GISBERIA ||" << endl;
+    cout << "||                                                ||" << endl;
+    cout << "====================================================" << endl << endl;
 
-        cout << "=== PARTIDAS GUARDADAS ===" << endl << endl;
+    cout << "=== PARTIDAS GUARDADAS ===" << endl << endl;
 
-        cout << "[1] Geo_partida.json" << endl;
-        cout << "[2] Crear nueva partida" << endl;
-        cout << "[0] Salir" << endl << endl;
+    cout << "[1] Geo_partida.json" << endl;
+    cout << "[2] Crear nueva partida" << endl;
+    cout << "[0] Salir" << endl << endl;
 
-        cout << "Seleccione una opcion: ";
-        cin >> opcion;
+    cout << "Seleccione una opcion: ";
+    cin >> opcion;
 
-        switch (opcion) {
-            case 1:
-                cout << "\nCargando partida...\n" << endl;
-                // Aquí iría la lógica para cargar el objeto Jugador y su Ejercito
-                break;
-            case 2:
-                cout << "\nIniciando configuracion de nueva partida...\n" << endl;
-                // Aquí llamarías a la creación de Jugador y selección de Tropas
-                break;
-            case 0:
-                cout << "Saliendo del sistema..." << endl;
-                break;
-            default:
-                cout << "Opcion no valida. Intente de nuevo." << endl;
-        }
+    switch (opcion) {
+        case 1:
+            cout << "\nCargando partida...\n" << endl;
+            // Aquí iría la lógica para cargar el objeto Jugador y su Ejercito
+            break;
+        case 2:
+            cout << "\nIniciando configuracion de nueva partida...\n" << endl;
+            // Aquí llamarías a la creación de Jugador y selección de Tropas
+            break;
+        case 0:
+            cout << "Saliendo del sistema..." << endl;
+            return; // ✅ caso base: termina la recursión
+        default:
+            cout << "Opcion no valida. Intente de nuevo." << endl;
+            break;
     }
-    // Ejemplo de uso rápido
-    Soldado s1("Legionario", true, 1, 15);
-    Item pocion("Poción de Fuerza", TipoItem::BOOST_PODER, 8);
 
-    s1.mostrarInfo();
-    s1.aplicarItem(pocion);
-    s1.ganarExperiencia(70);
-    s1.mostrarInfo();
+    // ✅ Repite el menú sin while/for
+    menuPrincipal();
+}
+
+int main() {
+    // Menú principal
+    menuPrincipal();
+
+    // ✅ Ejemplo de uso rápido con “puros punteros”
+    Soldado* s1 = new Soldado("Legionario", true, 1, 15);
+    Item* pocion = new Item("Pocion de Fuerza", TipoItem::BOOST_PODER, 8);
+
+    s1->mostrarInfo();
+    s1->aplicarItem(pocion);
+    s1->ganarExperiencia(70);
+    s1->mostrarInfo();
+
+    // ✅ Liberación (en el proyecto real dependerá del ownership)
+    delete pocion;
+    delete s1;
 
     return 0;
 }
