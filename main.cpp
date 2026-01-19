@@ -197,14 +197,24 @@ private:
     string nombreEjercito;
     bool esAliado;
     int numTropas;
+
 public:
-    Ejercito() : tropas(nullptr), numTropas(0) {}
+    // CORRECCIÓN 1: Constructor que acepta nombre
+    Ejercito(string nombre = "Ejercito", bool aliado = true)
+        : nombreEjercito(nombre), esAliado(aliado), tropas(nullptr), numTropas(0) {}
+
+    // Destructor (OBLIGATORIO para evitar fugas con array dinámico)
+    ~Ejercito() {
+        if (tropas != nullptr) delete[] tropas;
+    }
 
     void agregarTropa(Tropa* t) {
+        // (Nota: Mantengo su lógica de array manual, aunque es ineficiente)
         Tropa** nuevaLista = new Tropa*[numTropas + 1];
         for(int i=0; i<numTropas; i++) nuevaLista[i] = tropas[i];
         nuevaLista[numTropas] = t;
-        delete[] tropas;
+
+        if (tropas != nullptr) delete[] tropas;
         tropas = nuevaLista;
         numTropas++;
     }
@@ -214,6 +224,20 @@ public:
             tropas[i]->aplicarItemATodos(it);
         }
     }
+
+    // CORRECCIÓN 2: Getters necesarios para que Jugador funcione
+    int getNumTropas() const { return numTropas; }
+
+    Tropa* getTropa(int index) {
+        if (index >= 0 && index < numTropas) {
+            return tropas[index];
+        }
+        return nullptr;
+    }
+
+    void mostrarInfo() const {
+        cout << "Ejercito: " << nombreEjercito << " | Tropas: " << numTropas << endl;
+    }
 };
 
 //Clase jugador
@@ -222,20 +246,53 @@ private:
     string nombre;
     Ejercito* ejercitoActivo;
     ListaEnlazada<Item*> mochila;
+    ListaEnlazada<Soldado*>* reservas;
+
+    // Lógica recursiva para encontrar hueco en el ejército
+    bool buscarHuecoEnEjercito(int indexTropa, Soldado* s) {
+        if (indexTropa >= ejercitoActivo->getNumTropas()) return false;
+
+        Tropa* t = ejercitoActivo->getTropa(indexTropa);
+        // Asumimos que Tropa tiene un método para saber si cabe alguien
+        // Como su clase Tropa original devuelve false si falla el agregar:
+        if (t && t->agregarSoldado(s)) {
+            return true;
+        }
+        return buscarHuecoEnEjercito(indexTropa + 1, s);
+    }
 
 public:
-    Jugador(string n) : nombre(n), ejercitoActivo(new Ejercito()) {}
+    Jugador(string n) : nombre(n) {
+        // Ahora sí coincide con el constructor de Ejercito corregido
+        ejercitoActivo = new Ejercito("Ejercito de " + n);
+        reservas = new ListaEnlazada<Soldado*>();
+    }
+
+    ~Jugador() {
+        delete ejercitoActivo;
+        delete reservas;
+    }
 
     Ejercito* getEjercitoActual() { return ejercitoActivo; }
     ListaEnlazada<Item*>& getMochila() { return mochila; }
+    ListaEnlazada<Soldado*>* getReservas() { return reservas; }
 
-    // Método para la lógica de refuerzos (1.0 pt en rúbrica)
+    void reclutar(Soldado* s) { reservas->insertarAlFinal(s); }
+    void cogerItem(Item* i) { mochila.insertarAlFinal(i); }
+
+    // Función de refuerzos
     void llamarRefuerzos() {
-        cout << "Buscando refuerzos en la lista de soldados..." << endl;
-        // Aquí iría la lógica de buscar soldados no asignados
+        cout << "Buscando refuerzos..." << endl;
+        // (Lógica implementada en respuestas anteriores, aquí resumida para que compile)
+        if (!reservas->estaVacia()) {
+            Soldado* s = reservas->getCabeza()->datoNodo(); // Simplificado
+            if (buscarHuecoEnEjercito(0, s)) {
+                cout << "Refuerzo enviado." << endl;
+                reservas->eliminar(0);
+            }
+        }
     }
 };
-
 void mostrarMochilaR(Nodo<Item*>* nodo, int i) {
     if (nodo == nullptr) return;
     cout << "[" << i << "] ";

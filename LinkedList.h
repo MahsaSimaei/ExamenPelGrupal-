@@ -48,6 +48,15 @@ public:
     Nodo<T>* getCabeza() const {
         return cabeza;
     }
+    ~ListaEnlazada() {
+        destruirRecursivo(cabeza);
+    }
+
+    void destruirRecursivo(Nodo<T>* nodo) {
+        if (nodo == nullptr) return;
+        destruirRecursivo(nodo->enlaceNodo());
+        delete nodo; // Borra el contenedor (el nodo), no el dato T
+    }
     // Insertar (puedes dejar tu versión recursiva, está bien)
     void insertarAlFinal(T dato) {
         if (cabeza == nullptr) {
