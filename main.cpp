@@ -149,6 +149,7 @@ public:
 class Tropa {
 private:
     Soldado* soldados[5];
+    string nombreTropa;
 
     void aplicarItemRecursivo(const Item& it, int indice) {
         if(indice >= 5) return;
@@ -193,6 +194,8 @@ public:
 class Ejercito {
 private:
     Tropa** tropas;
+    string nombreEjercito;
+    bool esAliado;
     int numTropas;
 public:
     Ejercito() : tropas(nullptr), numTropas(0) {}
