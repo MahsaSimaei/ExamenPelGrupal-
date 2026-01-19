@@ -4,4 +4,5 @@ project(ExamenPelGrupal_)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(ExamenPelGrupal_ main.cpp
-        ListasEnlazadas.h)
+        ListasEnlazadas.h
+        Nodo.h)

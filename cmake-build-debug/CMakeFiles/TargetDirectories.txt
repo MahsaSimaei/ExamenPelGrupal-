@@ -1,3 +1,3 @@
-C:/Users/dnovo/Desktop/ExamenPelGrupal/cmake-build-debug/CMakeFiles/ExamenPelGrupal_.dir
-C:/Users/dnovo/Desktop/ExamenPelGrupal/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/dnovo/Desktop/ExamenPelGrupal/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+D:/Repositorios/examenPelG/ExamenPelGrupal-/cmake-build-debug/CMakeFiles/ExamenPelGrupal_.dir
+D:/Repositorios/examenPelG/ExamenPelGrupal-/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/Repositorios/examenPelG/ExamenPelGrupal-/cmake-build-debug/CMakeFiles/rebuild_cache.dir
