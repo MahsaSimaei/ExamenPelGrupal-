@@ -45,7 +45,9 @@ private:
 
 public:
     ListaEnlazada() : cabeza(nullptr), tamano(0) {}
-
+    Nodo<T>* getCabeza() const {
+        return cabeza;
+    }
     // Insertar (puedes dejar tu versión recursiva, está bien)
     void insertarAlFinal(T dato) {
         if (cabeza == nullptr) {

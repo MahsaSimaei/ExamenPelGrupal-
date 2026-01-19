@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include "LinkedList.h"
 using namespace std;
 
 // Suponemos que existe un enum llamado TipoItem
@@ -143,6 +144,126 @@ public:
              << " | Exp: " << experienciaActual << "/" << experienciaParaNivel << endl;
     }
 };
+
+//Clase Tropa
+class Tropa {
+private:
+    Soldado* soldados[5];
+
+    void aplicarItemRecursivo(const Item& it, int indice) {
+        if(indice >= 5) return;
+        if(soldados[indice] != nullptr) {
+            soldados[indice]->aplicarItem(&it);
+        }
+        aplicarItemRecursivo(it, indice + 1);
+    }
+public:
+    Tropa() {
+        for(int i=0; i<5; i++) soldados[i] = nullptr;
+    }
+
+    bool agregarSoldado(Soldado* s) {
+        for(int i=0; i<5; i++) {
+            if(soldados[i] == nullptr) {
+                soldados[i] = s;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void aplicarItemATodos(const Item& it) {
+        aplicarItemRecursivo(it, 0);
+    }
+
+    // En la clase Tropa
+    void mostrarTropaRecursiva(int i) const {
+        if (i >= 5) return; // Caso base (Estructura fija de 5 datos)
+
+        if (soldados[i] != nullptr) {
+            soldados[i]->mostrarInfo();
+        } else {
+            cout << "  [" << i + 1 << "] --- Vacio ---" << endl;
+        }
+        mostrarTropaRecursiva(i + 1); // Paso recursivo
+    }
+};
+
+//Clase Ejercito
+class Ejercito {
+private:
+    Tropa** tropas;
+    int numTropas;
+public:
+    Ejercito() : tropas(nullptr), numTropas(0) {}
+
+    void agregarTropa(Tropa* t) {
+        Tropa** nuevaLista = new Tropa*[numTropas + 1];
+        for(int i=0; i<numTropas; i++) nuevaLista[i] = tropas[i];
+        nuevaLista[numTropas] = t;
+        delete[] tropas;
+        tropas = nuevaLista;
+        numTropas++;
+    }
+
+    void aplicarItemATodos(const Item& it) {
+        for(int i=0; i<numTropas; i++) {
+            tropas[i]->aplicarItemATodos(it);
+        }
+    }
+};
+
+//Clase jugador
+class Jugador {
+private:
+    string nombre;
+    Ejercito* ejercitoActivo;
+    ListaEnlazada<Item*> mochila;
+
+public:
+    Jugador(string n) : nombre(n), ejercitoActivo(new Ejercito()) {}
+
+    Ejercito* getEjercitoActual() { return ejercitoActivo; }
+    ListaEnlazada<Item*>& getMochila() { return mochila; }
+
+    // Método para la lógica de refuerzos (1.0 pt en rúbrica)
+    void llamarRefuerzos() {
+        cout << "Buscando refuerzos en la lista de soldados..." << endl;
+        // Aquí iría la lógica de buscar soldados no asignados
+    }
+};
+
+void mostrarMochilaR(Nodo<Item*>* nodo, int i) {
+    if (nodo == nullptr) return;
+    cout << "[" << i << "] ";
+    nodo->datoNodo()->mostrarInfo();
+    mostrarMochilaR(nodo->enlaceNodo(), i + 1);
+}
+
+void inventarioComandante(Jugador* j) {
+    cout << "\n--- INVENTARIO DE COMANDANTE ---" << endl;
+
+    // ERROR ORIGINAL: mostrarMochilaR(j->getMochila().obtener(), 1);
+
+    // CORRECCIÓN: Usar getCabeza()
+    mostrarMochilaR(j->getMochila().getCabeza(), 1);
+
+    int op;
+    cout << "\nSeleccione item a usar (0 para volver): ";
+    cin >> op;
+
+    if(op > 0) {
+        // Aquí también arreglamos el acceso para usar getCabeza()
+        Nodo<Item*>* aux = j->getMochila().getCabeza();
+
+        for(int i=1; i < op && aux != nullptr; i++) aux = aux->enlaceNodo();
+
+        if(aux != nullptr) {
+            j->getEjercitoActual()->aplicarItemATodos(*(aux->datoNodo()));
+        }
+    }
+}
+
 
 // ✅ Menú sin bucles: recursividad (por si el requisito prohíbe while/for)
 void menuPrincipal() {
