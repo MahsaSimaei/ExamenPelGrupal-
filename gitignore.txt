@@ -1,0 +1,31 @@
+# CLion & JetBrains IDEs
+.idea/
+*.iml
+
+# CMake build directories
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+install_manifest.txt
+compile_commands.json
+
+# Executables and object files
+*.out
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Optional: ignore user-specific config
+*.user
