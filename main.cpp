@@ -267,8 +267,6 @@ void inventarioComandante(Jugador* j) {
     }
 }
 
-
-// ✅ Menú sin bucles: recursividad (por si el requisito prohíbe while/for)
 void menuPrincipal() {
     int opcion = -1;
 
@@ -295,7 +293,6 @@ void menuPrincipal() {
             break;
         case 2:
             cout << "\nIniciando configuracion de nueva partida...\n" << endl;
-            // Aquí llamarías a la creación de Jugador y selección de Tropas
             break;
         case 0:
             cout << "Saliendo del sistema..." << endl;
@@ -305,8 +302,44 @@ void menuPrincipal() {
             break;
     }
 
-    // ✅ Repite el menú sin while/for
     menuPrincipal();
+}
+
+void menuGestionSoldados(Jugador* j) {
+    int opcion = -1;
+    cout << "\n.____________________________________________." << endl;
+    cout << "|        GESTION DE SOLDADOS Y TROPAS        |" << endl;
+    cout << "|____________________________________________|" << endl;
+    cout << "| 1. Crear nueva tropa                       |" << endl;
+    cout << "| 2. Modificar tropas del ejercito           |" << endl;
+    cout << "| 3. Entrenar soldados de una tropa          |" << endl;
+    cout << "| 4. Ver soldados disponibles                |" << endl;
+    cout << "| 5. Ver tropas existentes                   |" << endl;
+    cout << "| 6. Volver al menu principal                |" << endl;
+    cout << "|____________________________________________|" << endl;
+    cout << "Seleccione una opcion: ";
+    cin >> opcion;
+
+    switch (opcion) {
+        case 4: // Ver soldados disponibles (Lista Enlazada)
+            cout << "\n--- SOLDADOS DISPONIBLES EN RESERVA ---" << endl;
+
+            break;
+
+        case 5: // Ver tropas existentes (Estructura fija de 5)
+            cout << "\n=== TROPAS EXISTENTES ===" << endl;
+            break;
+
+        case 6:
+            return; // Caso base para salir de la recursión del menú
+
+        default:
+            cout << "Opcion no implementada o no valida." << endl;
+            break;
+    }
+
+    // Llamada recursiva para mantener el menú activo sin usar while
+    menuGestionSoldados(j);
 }
 
 int main() {
