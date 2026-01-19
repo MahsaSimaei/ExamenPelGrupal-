@@ -3,89 +3,87 @@
 
 #include "Nodo.h"
 #include <iostream>
+#include <functional> // Necesario para pasar funciones
 using namespace std;
 
 template <typename T>
 class ListaEnlazada {
 private:
-    Nodo<T>* cabeza; 
+    Nodo<T>* cabeza;
+    int tamano;
 
-    // --- MÉTODOS PRIVADOS RECURSIVOS (AYUDANTES) ---
 
-    // Ayudante para insertar: Busca el final llamándose a sí mismo
-    void insertarRecursivo(Nodo<T>* actual, T dato) {
-        // Caso base: Si el siguiente es nulo, insertamos aquí
-        if (actual->enlaceNodo() == nullptr) {
-            Nodo<T>* nuevoNodo = new Nodo<T>(dato);
-            actual->ponerEnlace(nuevoNodo);
-        } else {
-            // Paso recursivo: Seguimos buscando en el siguiente
-            insertarRecursivo(actual->enlaceNodo(), dato);
-        }
+    void aplicarRecursivo(Nodo<T>* nodo, function<void(T)> accion) const {
+        if (nodo == nullptr) return;
+        accion(nodo->datoNodo()); // Ejecuta la acción (mostrar, curar, atacar...)
+        aplicarRecursivo(nodo->enlaceNodo(), accion); // Llamada recursiva
     }
 
-    // Ayudante para mostrar: Imprime y llama al siguiente
-    void mostrarRecursivo(Nodo<T>* actual) const {
-        if (actual == nullptr) {
-            return; // Caso base: fin de la lista
-        }
-        // Asumimos que T es un puntero (Soldado*) y tiene mostrarInfo()
-        // Si T es un tipo básico, usa cout << actual->datoNodo()
-        // Para el examen, como son punteros a Soldado, idealmente:
-        // actual->datoNodo()->mostrarInfo(); 
-        
-        // Mantengo tu lógica genérica:
-        cout << actual->datoNodo() << " "; 
-        
-        mostrarRecursivo(actual->enlaceNodo()); // Paso recursivo
+    // Ayudante para obtener por índice (Recursivo)
+    T getRecursivo(Nodo<T>* nodo, int index, int contador) const {
+        if (nodo == nullptr) return nullptr; // O manejar error
+        if (contador == index) return nodo->datoNodo();
+        return getRecursivo(nodo->enlaceNodo(), index, contador + 1);
     }
 
-    // Ayudante para borrar todo (Destructor)
-    void borrarTodoRecursivo(Nodo<T>* actual) {
-        if (actual == nullptr) return;
-        
-        // Primero borro el resto de la lista (post-orden)
-        borrarTodoRecursivo(actual->enlaceNodo());
-        
-        // Luego borro este nodo
-        delete actual;
+    // Ayudante para eliminar por índice (Recursivo)
+    Nodo<T>* eliminarRecursivo(Nodo<T>* nodo, int index, int contador, bool& eliminado) {
+        if (nodo == nullptr) return nullptr;
+
+        if (contador == index) {
+            Nodo<T>* temp = nodo->enlaceNodo();
+            // Nota: Aquí NO hacemos delete del dato T, solo del nodo de la lista.
+            // La gestión de memoria del objeto T es responsabilidad de quien usa la lista.
+            delete nodo;
+            eliminado = true;
+            return temp;
+        }
+
+        nodo->ponerEnlace(eliminarRecursivo(nodo->enlaceNodo(), index, contador + 1, eliminado));
+        return nodo;
     }
 
 public:
-    // Constructor
-    ListaEnlazada() : cabeza(nullptr) {}
+    ListaEnlazada() : cabeza(nullptr), tamano(0) {}
 
-    // Destructor Recursivo
-    ~ListaEnlazada() {
-        borrarTodoRecursivo(cabeza);
-    }
-
-    // Insertar un elemento al final (Recursivo)
+    // Insertar (puedes dejar tu versión recursiva, está bien)
     void insertarAlFinal(T dato) {
-        // Caso especial: lista vacía
         if (cabeza == nullptr) {
             cabeza = new Nodo<T>(dato);
         } else {
-            // Llamamos al ayudante recursivo
-            insertarRecursivo(cabeza, dato);
+            insertarAux(cabeza, dato);
+        }
+        tamano++;
+    }
+
+    void insertarAux(Nodo<T>* nodo, T dato) {
+        if (nodo->enlaceNodo() == nullptr) {
+            nodo->ponerEnlace(new Nodo<T>(dato));
+        } else {
+            insertarAux(nodo->enlaceNodo(), dato);
         }
     }
 
-    // Imprimir todos los elementos (Recursivo)
-    void mostrarLista() const {
-        mostrarRecursivo(cabeza);
-        cout << endl;
-    }
-    
-    // Obtener la cabeza (necesario para otras funciones recursivas externas)
-    Nodo<T>* getCabeza() const {
-        return cabeza;
-    }
-    
-    // Método extra útil para el juego: Comprobar si está vacía
-    bool estaVacia() const {
-        return cabeza == nullptr;
-    }
-};
+    // --- MÉTODOS CLAVE PARA LA RÚBRICA ---
 
-#endif //LISTASENLAZADAS_H
+    // 1. Ejecutar algo en todos los elementos (RECURSIVO)
+    // Esto sustituye a los bucles for/while fuera de la lista
+    void paraCadaElemento(function<void(T)> accion) {
+        aplicarRecursivo(cabeza, accion);
+    }
+
+    // 2. Obtener elemento (necesario para reforzar tropas)
+    T obtener(int indice) {
+        return getRecursivo(cabeza, indice, 0);
+    }
+
+    // 3. Eliminar (necesario para mover soldado de Reserva a Tropa)
+    void eliminar(int indice) {
+        bool eliminado = false;
+        cabeza = eliminarRecursivo(cabeza, indice, 0, eliminado);
+        if (eliminado) tamano--;
+    }
+
+    int getTamano() const { return tamano; }
+};
+#endif
