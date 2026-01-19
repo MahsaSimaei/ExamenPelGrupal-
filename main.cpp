@@ -342,6 +342,30 @@ void menuGestionSoldados(Jugador* j) {
     menuGestionSoldados(j);
 }
 
+// --- MENU PRINCIPAL - EJERCITO (Imagen Blanca) ---
+void subMenuEjercito(Jugador* j) {
+    int op;
+    cout << "\n .____________________________________________." << endl;
+    cout << " |          MENU PRINCIPAL - EJERCITO         |" << endl;
+    cout << " |____________________________________________|" << endl;
+    cout << " |                                            |" << endl;
+    cout << " | 1. Ver Informacion del ejercito activo     |" << endl;
+    cout << " | 2. Gestionar soldados                      |" << endl;
+    cout << " | 3. Inventario de comandante                |" << endl;
+    cout << " | 4. Hoguera de Batalla                      |" << endl;
+    cout << " | 5. Salir                                   |" << endl;
+    cout << " .____________________________________________." << endl;
+    cout << " Seleccione una opcion: "; cin >> op;
+
+    switch(op) {
+        case 1: j->getEjercitoActual()->aplicarItemATodos(Item("Info", TipoItem::BOOST_PODER, 0)); break;
+        case 2: menuGestionSoldados(j); break;
+        case 3: inventarioComandante(j); break;
+        case 5: return;
+    }
+    subMenuEjercito(j); // Paso recursivo
+}
+
 int main() {
     // Menú principal
     menuPrincipal();
