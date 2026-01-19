@@ -1,6 +1,6 @@
-#ifndef LISTASENLAZADAS_H
-#define LISTASENLAZADAS_H
 
+#ifndef LINKEDLIST_H
+#define LINKEDLIST_H
 #include "Nodo.h"
 #include <iostream>
 #include <functional> // Necesario para pasar funciones
@@ -85,5 +85,6 @@ public:
     }
 
     int getTamano() const { return tamano; }
+    bool estaVacia() const { return cabeza == nullptr; }
 };
-#endif
+#endif //LINKEDLIST_H
